@@ -1,6 +1,6 @@
 # Systems and Security Lab
 
-A growing repository for operating systems, Linux, networking, and security practice projects. The goal is to keep course work and hands-on exercises organized in one place with clear project writeups and room for future labs.
+A growing repository for operating systems, Linux, networking, and security practice projects. The goal is to keep hands-on exercises organized in one place with clear project writeups and room for future labs.
 
 ## Repository Layout
 
