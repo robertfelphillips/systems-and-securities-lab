@@ -25,7 +25,7 @@ A Unix-style shell written in C for systems programming practice. This project s
 
 ## Concepts Demonstrated
 
-- Process creation and control (`fork`, `exec`, `waitpid`)
+- Process creation and control (`fork`, `execv`, `waitpid`)
 - Inter-process communication using pipes
 - File descriptor manipulation (`dup2`, `open`)
 - Command parsing and tokenization
