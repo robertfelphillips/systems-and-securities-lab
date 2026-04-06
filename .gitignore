@@ -1,0 +1,10 @@
+.DS_Store
+
+# Build outputs
+*.o
+*.out
+*.exe
+shell.exe
+
+# Editor folders
+.vscode/
