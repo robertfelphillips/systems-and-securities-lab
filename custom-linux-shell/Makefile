@@ -1,10 +1,11 @@
+SRC := src
 OBJ := obj
 BIN := bin
-EXECUTABLE := shell
+EXECUTABLE:= shell
 
-SRCS := $(wildcard *.c)
-OBJS := $(patsubst %.c,$(OBJ)/%.o,$(SRCS))
-INCS := -I.
+SRCS := $(wildcard $(SRC)/*.c)
+OBJS := $(patsubst $(SRC)/%.c,$(OBJ)/%.o,$(SRCS))
+INCS := -Iinclude/
 DIRS := $(OBJ)/ $(BIN)/
 EXEC := $(BIN)/$(EXECUTABLE)
 
@@ -17,7 +18,7 @@ all: $(EXEC)
 $(EXEC): $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(EXEC)
 
-$(OBJ)/%.o: %.c
+$(OBJ)/%.o: $(SRC)/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 run: $(EXEC)

@@ -17,11 +17,11 @@ A Unix-style shell written in C for systems programming practice. This project s
 
 ## Files
 
-- `main.c`
-- `shell.c`
-- `shell.h`
-- `lexer.c`
-- `lexer.h`
+- `src/main.c`
+- `src/shell.c`
+- `include/shell.h`
+- `src/lexer.c`
+- `include/lexer.h`
 - `Makefile`
 
 ## Build and Run
