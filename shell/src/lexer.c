@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+static int is_shell_delimiter(char c) {
+    return c == '|' || c == '<' || c == '>' || c == '&';
+}
+
 char *get_input(void) {
     char *buffer = NULL;
     int bufsize = 0;
@@ -58,18 +62,45 @@ void add_token(tokenlist *tokens, char *item) {
 }
 
 tokenlist *get_tokens(char *input) {
-    char *buf = (char *)malloc(strlen(input) + 1);
-    strcpy(buf, input);
-
     tokenlist *tokens = new_tokenlist();
+    size_t i = 0;
 
-    char *tok = strtok(buf, " ");
-    while (tok != NULL) {
-        add_token(tokens, tok);
-        tok = strtok(NULL, " ");
+    while (input[i] != '\0') {
+        while (input[i] == ' ' || input[i] == '\t') {
+            i++;
+        }
+
+        if (input[i] == '\0') {
+            break;
+        }
+
+        if (is_shell_delimiter(input[i])) {
+            char op[2] = {input[i], '\0'};
+            add_token(tokens, op);
+            i++;
+            continue;
+        }
+
+        size_t start = i;
+        while (input[i] != '\0' &&
+               input[i] != ' ' &&
+               input[i] != '\t' &&
+               !is_shell_delimiter(input[i])) {
+            i++;
+        }
+
+        size_t length = i - start;
+        char *token = (char *)malloc(length + 1);
+        if (!token) {
+            free_tokens(tokens);
+            return NULL;
+        }
+
+        memcpy(token, input + start, length);
+        token[length] = '\0';
+        add_token(tokens, token);
+        free(token);
     }
-
-    free(buf);
     return tokens;
 }
 

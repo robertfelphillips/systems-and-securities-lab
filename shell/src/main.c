@@ -9,6 +9,40 @@
 #include "shell.h"
 #include "lexer.h"
 
+static int is_operator(const char *token) {
+    return strcmp(token, "|") == 0 ||
+           strcmp(token, "<") == 0 ||
+           strcmp(token, ">") == 0 ||
+           strcmp(token, "&") == 0;
+}
+
+static int validate_syntax(tokenlist *tokens) {
+    if (tokens->size == 0) {
+        return 0;
+    }
+
+    for (size_t i = 0; i < tokens->size; i++) {
+        if (strcmp(tokens->items[i], "|") == 0) {
+            if (i == 0 || i == tokens->size - 1 ||
+                strcmp(tokens->items[i - 1], "|") == 0 ||
+                strcmp(tokens->items[i + 1], "|") == 0) {
+                fprintf(stderr, "syntax error near unexpected token `|`\n");
+                return 0;
+            }
+        } else if (strcmp(tokens->items[i], "<") == 0 || strcmp(tokens->items[i], ">") == 0) {
+            if (i == tokens->size - 1 || is_operator(tokens->items[i + 1])) {
+                fprintf(stderr, "syntax error near unexpected token `%s`\n", tokens->items[i]);
+                return 0;
+            }
+        } else if (strcmp(tokens->items[i], "&") == 0 && i != tokens->size - 1) {
+            fprintf(stderr, "syntax error: `&` must appear at the end of the command\n");
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 int main(void) {
     char prompt[BUFFER_SIZE];
     bg_job jobs[MAX_BG_JOBS];
@@ -40,12 +74,23 @@ int main(void) {
         }
 
         tokenlist *tokens = get_tokens(input);
+        if (tokens == NULL) {
+            fprintf(stderr, "failed to tokenize input\n");
+            free(input);
+            continue;
+        }
 
         // expand environment vars and ~ tokens
         expand_env_tokens(tokens);
         expand_tilde_tokens(tokens);
 
         if (tokens->size == 0) {
+            free_tokens(tokens);
+            free(input);
+            continue;
+        }
+
+        if (!validate_syntax(tokens)) {
             free_tokens(tokens);
             free(input);
             continue;
@@ -183,6 +228,7 @@ int main(void) {
                     if (pid < 0) {
                         perror("fork");
                     } else if (pid == 0) {
+                        setpgid(0, 0);
                         if (redir.input_file) {
                             int fd = open(redir.input_file, O_RDONLY);
                             if (fd < 0) { perror(redir.input_file); exit(1); }
@@ -199,7 +245,10 @@ int main(void) {
                         perror("execv");
                         exit(1);
                     } else {
-                        add_bg_job(jobs, pid, cmd_line, &job_counter);
+                        setpgid(pid, pid);
+                        if (add_bg_job(jobs, pid, cmd_line, &job_counter) < 0) {
+                            fprintf(stderr, "jobs: maximum number of background jobs reached\n");
+                        }
                     }
                 } else {
                     execute_command_with_redirection(path, new_args, &redir);

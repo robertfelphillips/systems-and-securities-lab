@@ -12,6 +12,7 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <errno.h>
 
 // build prompt
 void get_prompt(char *prompt, size_t prompt_size) {
@@ -94,6 +95,7 @@ char *search_path(const char *cmd) {
     if (!path_env) return NULL;
 
     char *path_copy = strdup(path_env);
+    if (!path_copy) return NULL;
     char *dir = strtok(path_copy, ":");
 
     while (dir != NULL) {
@@ -281,8 +283,19 @@ void check_bg_jobs(bg_job *jobs) {
     for (int i = 0; i < MAX_BG_JOBS; i++) {
         if (jobs[i].active) {
             int status;
-            pid_t result = waitpid(jobs[i].pid, &status, WNOHANG);
-            if (result > 0) {
+            pid_t result;
+            int still_running = 0;
+
+            while ((result = waitpid(-jobs[i].pid, &status, WNOHANG)) > 0) {
+            }
+
+            if (result == 0) {
+                still_running = 1;
+            } else if (result < 0 && errno != ECHILD) {
+                still_running = 1;
+            }
+
+            if (!still_running) {
                 printf("[%d]+ done %s\n", jobs[i].job_number, jobs[i].command_line);
                 jobs[i].active = 0;
             }
@@ -294,7 +307,8 @@ void wait_all_bg_jobs(bg_job *jobs) {
     for (int i = 0; i < MAX_BG_JOBS; i++) {
         if (jobs[i].active) {
             int status;
-            waitpid(jobs[i].pid, &status, 0);
+            while (waitpid(-jobs[i].pid, &status, 0) > 0) {
+            }
             printf("[%d]+ done %s\n", jobs[i].job_number, jobs[i].command_line);
             jobs[i].active = 0;
         }
@@ -325,7 +339,7 @@ int execute_pipeline_bg(char ***commands, int num_commands, bg_job *jobs, int *j
         }
     }
 
-    pid_t last_pid = -1;
+    pid_t pgid = 0;
 
     for (int i = 0; i < num_commands; i++) {
         char *path = search_path(commands[i][0]);
@@ -344,6 +358,11 @@ int execute_pipeline_bg(char ***commands, int num_commands, bg_job *jobs, int *j
             free(path);
             return -1;
         } else if (pid == 0) {
+            if (pgid == 0) {
+                pgid = getpid();
+            }
+            setpgid(0, pgid);
+
             if (i > 0) {
                 dup2(pipefds[(i - 1) * 2], STDIN_FILENO);
             }
@@ -358,9 +377,10 @@ int execute_pipeline_bg(char ***commands, int num_commands, bg_job *jobs, int *j
             exit(1);
         }
 
-        if (i == num_commands - 1) {
-            last_pid = pid;
+        if (pgid == 0) {
+            pgid = pid;
         }
+        setpgid(pid, pgid);
         free(path);
     }
 
@@ -368,7 +388,10 @@ int execute_pipeline_bg(char ***commands, int num_commands, bg_job *jobs, int *j
         close(pipefds[i]);
     }
 
-    add_bg_job(jobs, last_pid, cmd_line, job_counter);
+    if (add_bg_job(jobs, pgid, cmd_line, job_counter) < 0) {
+        fprintf(stderr, "jobs: maximum number of background jobs reached\n");
+        return -1;
+    }
 
     return 0;
 }
