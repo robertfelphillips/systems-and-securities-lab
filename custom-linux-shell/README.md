@@ -1,19 +1,35 @@
 # Custom Linux Shell
 
+## Overview
+
 A Unix-style shell written in C for systems programming practice. This project supports command execution, environment expansion, pipelines, redirection, background jobs, and a few built-in commands.
 
-## Highlights
+## Features
 
 - Custom prompt showing `user@host:cwd`
 - Tokenization for commands with `|`, `<`, `>`, and `&`
 - Environment variable expansion such as `$HOME`
 - Tilde expansion for `~` and `~/...`
-- PATH lookup for executables
+- Executable resolution using system PATH
 - Input and output redirection
-- Multi-stage pipelines
-- Background job tracking with `jobs`
+- Multi-stage command pipelines
+- Background job tracking with job control (`jobs`)
 - Built-in `cd` and `exit`
 - Exit history for the last few valid commands
+
+## Tech Stack
+
+- Language: C
+- Environment: POSIX (Linux / macOS / WSL)
+- Tools: GCC, Makefile
+
+## Concepts Demonstrated
+
+- Process creation and control (`fork`, `exec`, `waitpid`)
+- Inter-process communication using pipes
+- File descriptor manipulation (`dup2`, `open`)
+- Command parsing and tokenization
+- Background job management
 
 ## Files
 
