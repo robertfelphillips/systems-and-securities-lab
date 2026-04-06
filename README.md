@@ -1,64 +1,19 @@
-# Mini Shell in C
+# Systems and Security Lab
 
-A Unix-style shell written in C for systems programming practice. The project supports command execution, environment expansion, pipelines, redirection, background jobs, and a few built-in commands.
+A growing repository for operating systems, Linux, networking, and security practice projects. The goal is to keep course work and hands-on exercises organized in one place with clear project writeups and room for future labs.
 
-## Highlights
+## Repository Layout
 
-- Custom prompt showing `user@host:cwd`
-- Tokenization for commands with `|`, `<`, `>`, and `&`
-- Environment variable expansion such as `$HOME`
-- Tilde expansion for `~` and `~/...`
-- PATH lookup for executables
-- Input and output redirection
-- Multi-stage pipelines
-- Background job tracking with `jobs`
-- Built-in `cd` and `exit`
-- Exit history for the last few valid commands
+- `custom-linux-shell/` - a Unix-style shell written in C with piping, redirection, background jobs, built-in commands, and environment expansion
+- `linux-practice/` - Linux command notes, small exercises, and terminal practice logs
+- `networking-labs/` - future networking experiments such as Wireshark captures and Nmap scans
+- `log-analysis/` - future log parsing and system investigation work
+- `scripts/` - future automation scripts in Bash or Python
 
-## Project Structure
+## Featured Project
 
-```text
-shell/
-  include/
-    lexer.h
-    shell.h
-  src/
-    lexer.c
-    main.c
-    shell.c
-  Makefile
-```
+The strongest project in the repo right now is `custom-linux-shell`, a systems programming project built in C using POSIX process and file APIs such as `fork`, `execv`, `waitpid`, `pipe`, `dup2`, and `open`.
 
-## Build and Run
+## Planned Growth
 
-This project targets a POSIX environment such as Linux, macOS, or WSL.
-
-```bash
-cd shell
-make
-./bin/shell
-```
-
-## Example Commands
-
-```bash
-ls
-echo $HOME
-cat < input.txt
-echo hello > output.txt
-ls | wc
-sleep 5 &
-jobs
-cd ..
-exit
-```
-
-## Design Notes
-
-- The shell uses `fork`, `execv`, `waitpid`, `pipe`, `dup2`, and `open` to implement process creation and I/O control.
-- Background pipelines are tracked as job groups so completed children can be reaped correctly.
-- Basic syntax validation is included for malformed pipes, redirection, and background operators.
-
-## Current Scope
-
-This is a teaching-focused shell, not a full Bash replacement. It does not yet implement quoting, wildcard expansion, command substitution, or advanced job control.
+This repo is meant to grow over time into a broader systems and security portfolio. Each folder is structured so future work can be added without reorganizing the whole repository again.

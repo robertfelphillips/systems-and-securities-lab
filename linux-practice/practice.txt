@@ -1,0 +1,5 @@
+Linux practice log
+
+- Add short command sessions here
+- Keep examples simple and readable
+- Turn the best notes into polished markdown later
