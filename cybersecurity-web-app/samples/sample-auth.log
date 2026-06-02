@@ -1,0 +1,6 @@
+Apr 13 18:22:11 web01 sshd[1122]: Failed password for invalid user admin from 192.168.1.25 port 55231 ssh2
+Apr 13 18:22:15 web01 sshd[1123]: Failed password for root from 203.0.113.10 port 49822 ssh2
+Apr 13 18:22:41 web01 sshd[1124]: Accepted password for robert from 10.0.0.14 port 51244 ssh2
+Apr 13 18:23:22 web01 app: ERROR database connection denied for user app_user
+Apr 13 18:24:09 web01 firewall: WARNING blocked connection from 8.8.8.8 to port 22
+Apr 13 18:25:44 web01 app: timeout while connecting to payment service

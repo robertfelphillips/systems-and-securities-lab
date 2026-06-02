@@ -1,0 +1,15 @@
+﻿[Unit]
+Description=Cybersecurity Web App
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/cybersecurity-web-app
+Environment="PATH=/var/www/cybersecurity-web-app/.venv/bin"
+ExecStart=/var/www/cybersecurity-web-app/.venv/bin/gunicorn -c deploy/gunicorn.conf.py app.app:app
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

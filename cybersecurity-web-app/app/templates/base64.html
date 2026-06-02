@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Base64 Tool | Cybersecurity Tools</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <p class="eyebrow">Local security toolkit</p>
+      <h1>Base64 Tool</h1>
+      <p class="intro">Encode plain text or decode Base64 text.</p>
+    </header>
+
+    <section class="workspace" aria-label="Base64 encoder and decoder">
+      <form class="tool-form" method="post" data-running-text="processing...">
+        <label for="input_text">Input text</label>
+        <textarea id="input_text" name="input_text" rows="8" spellcheck="false" placeholder="Type or paste text here">{{ input_text }}</textarea>
+
+        <div class="control-row">
+          <fieldset class="choice-group">
+            <legend>Action</legend>
+            <label class="choice">
+              <input type="radio" name="action" value="encode" {% if selected_action == "encode" %}checked{% endif %}>
+              Encode
+            </label>
+            <label class="choice">
+              <input type="radio" name="action" value="decode" {% if selected_action == "decode" %}checked{% endif %}>
+              Decode
+            </label>
+          </fieldset>
+
+          <button type="submit">Run Base64</button>
+        </div>
+      </form>
+
+      <aside class="output-panel" aria-live="polite">
+        <p class="terminal-state" data-status-target data-state="{% if error %}error{% elif output_text %}complete{% else %}idle{% endif %}">{% if error %}error{% elif output_text %}complete{% else %}idle{% endif %}</p>
+        <h2>Output</h2>
+        {% if error %}
+          <p class="error">{{ error }}</p>
+        {% elif output_text %}
+          <pre>{{ output_text }}</pre>
+        {% else %}
+          <p class="empty">Your output will appear here.</p>
+        {% endif %}
+      </aside>
+    </section>
+
+    <nav class="tool-list" aria-label="Tools">
+      <a href="{{ url_for('index') }}">Hash generator</a>
+      <a class="active" href="{{ url_for('base64_tool') }}">Base64 encoder/decoder</a>
+      <a href="{{ url_for('port_scanner') }}">Controlled port scanner</a>
+      <a href="{{ url_for('log_parser') }}">Log parser</a>
+    </nav>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

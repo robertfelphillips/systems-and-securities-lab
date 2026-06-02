@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Port Scanner | Cybersecurity Tools</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <p class="eyebrow">Local security toolkit</p>
+      <h1>Controlled Port Scanner</h1>
+      <p class="intro">Check a small range of ports on a host you own or have permission to test.</p>
+    </header>
+
+    <section class="workspace" aria-label="Controlled port scanner">
+      <form class="tool-form" method="post" data-running-text="scanning...">
+        <p class="notice">Only scan systems you own or have clear permission to assess. This tool is limited to {{ max_port_range }} ports per scan.</p>
+
+        <div class="field">
+          <label for="host">Host</label>
+          <input id="host" name="host" type="text" value="{{ host }}" placeholder="127.0.0.1" autocomplete="off">
+        </div>
+
+        <div class="port-row">
+          <div class="field">
+            <label for="start_port">Start port</label>
+            <input id="start_port" name="start_port" type="number" min="1" max="65535" value="{{ start_port }}">
+          </div>
+
+          <div class="field">
+            <label for="end_port">End port</label>
+            <input id="end_port" name="end_port" type="number" min="1" max="65535" value="{{ end_port }}">
+          </div>
+        </div>
+
+        <label class="permission">
+          <input type="checkbox" name="permission_ack" value="yes" {% if permission_ack %}checked{% endif %}>
+          I have permission to scan this host.
+        </label>
+
+        <button class="primary-action" type="submit">Scan ports</button>
+      </form>
+
+      <aside class="output-panel results-panel" aria-live="polite">
+        <p class="terminal-state" data-status-target data-state="{% if error %}error{% elif results %}complete{% else %}idle{% endif %}">{% if error %}error{% elif results %}complete{% else %}idle{% endif %}</p>
+        <h2>Results</h2>
+        {% if error %}
+          <p class="error">{{ error }}</p>
+        {% elif results %}
+          <div class="scan-summary">
+            <p><span>Host</span>{{ scan_summary.host }}</p>
+            <p><span>Range</span>{{ scan_summary.range }}</p>
+            <p><span>Open</span>{{ scan_summary.open_count }}</p>
+            <p><span>Closed/timeout</span>{{ scan_summary.other_count }}</p>
+          </div>
+
+          <h3>Open Ports</h3>
+          <div class="results-box">
+            {% if open_results %}
+              {% for result in open_results %}
+                <p class="result-line">
+                  <span class="port-number">[{{ "%05d"|format(result.port) }}]</span>
+                  <span class="status status-{{ result.status }}">{{ result.status|upper }}</span>
+                  <span>{{ result.detail }}</span>
+                </p>
+              {% endfor %}
+            {% else %}
+              <p class="empty compact-empty">No open ports found.</p>
+            {% endif %}
+          </div>
+
+          <details class="full-log">
+            <summary>Show full scan log</summary>
+            <div class="results-box full-results">
+              {% for result in results %}
+                <p class="result-line">
+                  <span class="port-number">[{{ "%05d"|format(result.port) }}]</span>
+                  <span class="status status-{{ result.status }}">{{ result.status|upper }}</span>
+                  <span>{{ result.detail }}</span>
+                </p>
+              {% endfor %}
+            </div>
+          </details>
+        {% else %}
+          <p class="empty">Ready to scan. Enter a host and press "SCAN PORTS".</p>
+        {% endif %}
+      </aside>
+    </section>
+
+    <nav class="tool-list" aria-label="Tools">
+      <a href="{{ url_for('index') }}">Hash generator</a>
+      <a href="{{ url_for('base64_tool') }}">Base64 encoder/decoder</a>
+      <a class="active" href="{{ url_for('port_scanner') }}">Controlled port scanner</a>
+      <a href="{{ url_for('log_parser') }}">Log parser</a>
+    </nav>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

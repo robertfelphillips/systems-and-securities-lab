@@ -8,3 +8,13 @@ shell.exe
 
 # Editor folders
 .vscode/
+
+# Python / Flask
+cybersecurity-web-app/.venv/
+cybersecurity-web-app/.venv-linux/
+cybersecurity-web-app/__pycache__/
+cybersecurity-web-app/*.py[cod]
+cybersecurity-web-app/.pytest_cache/
+cybersecurity-web-app/.coverage
+cybersecurity-web-app/instance/
+cybersecurity-web-app/.env

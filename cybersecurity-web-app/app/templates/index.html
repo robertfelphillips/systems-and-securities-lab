@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cybersecurity Tools</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <p class="eyebrow">Local security toolkit</p>
+      <h1>Hash Generator</h1>
+      <p class="intro">Paste text, choose an algorithm, and generate a digest.</p>
+    </header>
+
+    <section class="workspace" aria-label="Hash generator">
+      <form class="tool-form" method="post" data-running-text="hashing...">
+        <label for="input_text">Input text</label>
+        <textarea id="input_text" name="input_text" rows="8" spellcheck="false" placeholder="Type or paste text here">{{ input_text }}</textarea>
+
+        <div class="control-row">
+          <div class="field">
+            <label for="algorithm">Algorithm</label>
+            <select id="algorithm" name="algorithm">
+              {% for value, label in algorithms.items() %}
+                <option value="{{ value }}" {% if value == selected_algorithm %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <button type="submit">Generate hash</button>
+        </div>
+      </form>
+
+      <aside class="output-panel" aria-live="polite">
+        <p class="terminal-state" data-status-target data-state="{% if error %}error{% elif digest %}complete{% else %}idle{% endif %}">{% if error %}error{% elif digest %}complete{% else %}idle{% endif %}</p>
+        <h2>Digest</h2>
+        {% if error %}
+          <p class="error">{{ error }}</p>
+        {% elif digest %}
+          <pre>{{ digest }}</pre>
+        {% else %}
+          <p class="empty">Your digest will appear here.</p>
+        {% endif %}
+      </aside>
+    </section>
+
+    <nav class="tool-list" aria-label="Tools">
+      <a class="active" href="{{ url_for('index') }}">Hash generator</a>
+      <a href="{{ url_for('base64_tool') }}">Base64 encoder/decoder</a>
+      <a href="{{ url_for('port_scanner') }}">Controlled port scanner</a>
+      <a href="{{ url_for('log_parser') }}">Log parser</a>
+    </nav>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

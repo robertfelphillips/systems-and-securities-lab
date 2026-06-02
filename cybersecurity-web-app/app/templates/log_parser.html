@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log Parser | Cybersecurity Tools</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <p class="eyebrow">Local security toolkit</p>
+      <h1>Log Parser</h1>
+      <p class="intro">Paste server or security logs to extract IPs, status codes, and suspicious events.</p>
+    </header>
+
+    <section class="workspace" aria-label="Log parser">
+      <form class="tool-form" method="post" enctype="multipart/form-data" data-running-text="analyzing...">
+        <label for="log_text">Log text</label>
+        <textarea id="log_text" name="log_text" rows="12" spellcheck="false" placeholder="Paste logs here">{{ log_text }}</textarea>
+
+        <div class="field">
+          <label for="log_file">Upload log file</label>
+          <input id="log_file" name="log_file" type="file" accept=".log,.txt,text/plain">
+          <p class="helper-text">Optional. Uploading a .log or .txt file replaces pasted text for this analysis. Max size: 1 MB.</p>
+        </div>
+
+        <button type="submit">Analyze logs</button>
+      </form>
+
+      <aside class="output-panel" aria-live="polite">
+        <p class="terminal-state" data-status-target data-state="{% if error %}error{% elif report %}complete{% else %}idle{% endif %}">{% if error %}error{% elif report %}complete{% else %}idle{% endif %}</p>
+        <h2>Analysis</h2>
+        {% if error %}
+          <p class="error">{{ error }}</p>
+        {% elif report %}
+          {% if uploaded_filename %}
+            <p class="source-line">Source file: {{ uploaded_filename }}</p>
+          {% endif %}
+
+          <div class="summary-grid">
+            <div class="metric">
+              <span>Lines</span>
+              <strong>{{ report.line_count }}</strong>
+            </div>
+            <div class="metric">
+              <span>Unique IPs</span>
+              <strong>{{ report.unique_ip_count }}</strong>
+            </div>
+            <div class="metric">
+              <span>Failed logins</span>
+              <strong>{{ report.failed_logins }}</strong>
+            </div>
+            <div class="metric">
+              <span>Errors</span>
+              <strong>{{ report.errors }}</strong>
+            </div>
+          </div>
+
+          {% if report.top_ips %}
+            <h3>Top IPs</h3>
+            <div class="table-wrap compact">
+              <table>
+                <thead>
+                  <tr>
+                    <th>IP</th>
+                    <th>Hits</th>
+                    <th>Scope</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in report.top_ips %}
+                    <tr>
+                      <td>{{ item.ip }}</td>
+                      <td>{{ item.count }}</td>
+                      <td>{{ item.scope }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% endif %}
+
+          {% if report.http_statuses %}
+            <h3>HTTP Statuses</h3>
+            <div class="status-list">
+              {% for item in report.http_statuses %}
+                <span class="status status-code">{{ item.status }}: {{ item.count }}</span>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          {% if report.matches %}
+            <h3>Flagged Lines</h3>
+            <div class="match-list">
+              {% for match in report.matches %}
+                <article class="match-line">
+                  <p><span>line {{ match.line_number }}</span> {{ match.category }}</p>
+                  <pre>{{ match.line }}</pre>
+                </article>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="empty">No suspicious lines found.</p>
+          {% endif %}
+        {% else %}
+          <p class="empty">Log analysis will appear here.</p>
+        {% endif %}
+      </aside>
+    </section>
+
+    <nav class="tool-list" aria-label="Tools">
+      <a href="{{ url_for('index') }}">Hash generator</a>
+      <a href="{{ url_for('base64_tool') }}">Base64 encoder/decoder</a>
+      <a href="{{ url_for('port_scanner') }}">Controlled port scanner</a>
+      <a class="active" href="{{ url_for('log_parser') }}">Log parser</a>
+    </nav>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
